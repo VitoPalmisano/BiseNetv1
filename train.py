@@ -112,8 +112,9 @@ def train(args, model, optimizer, dataloader_train, dataloader_val):
         print('loss for train : %f' % (loss_train_mean))
         if epoch % args.checkpoint_step == 0 and epoch != 0:
             if not os.path.isdir(args.save_model_path):
+                import os
                 os.mkdir(args.save_model_path)
-            torch.save(model.module.state_dict(),
+            torch.save(model.state_dict(),
                        os.path.join(args.save_model_path, 'model.pth'))
 
         if epoch % args.validation_step == 0 and epoch != 0:
@@ -122,7 +123,7 @@ def train(args, model, optimizer, dataloader_train, dataloader_val):
                 max_miou = miou
                 import os
                 os.makedirs(args.save_model_path, exist_ok=True)
-                torch.save(model.module.state_dict(),
+                torch.save(model.state_dict(),
                            os.path.join(args.save_model_path, 'best_dice_loss.pth'))
             writer.add_scalar('epoch/precision_val', precision, epoch)
             writer.add_scalar('epoch/miou val', miou, epoch)
@@ -191,7 +192,7 @@ def main(params):
     # load pretrained model if exists
     if args.pretrained_model_path is not None:
         print('load model from %s ...' % args.pretrained_model_path)
-        model.module.load_state_dict(torch.load(args.pretrained_model_path))
+        model.load_state_dict(torch.load(args.pretrained_model_path))
         print('Done!')
 
     # train
