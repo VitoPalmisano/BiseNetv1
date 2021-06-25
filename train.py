@@ -50,9 +50,11 @@ def val(args, model, dataloader):
         model.eval()
         # lista delle precisioni
         precision_record = []
+        
+        # inizializziamo una matrice per calcolare successivamente mIoU
         hist = np.zeros((args.num_classes, args.num_classes))
         
-        
+        # Itarates over what? Single images or batches?
         for i, (data, label) in enumerate(dataloader):
             if torch.cuda.is_available() and args.use_gpu:
                 data = data.cuda()
@@ -67,15 +69,19 @@ def val(args, model, dataloader):
 
             # compute per pixel accuracy
             precision = compute_global_accuracy(prediction, label)
+            
+            # Cosa fa fast_hist????
             hist += fast_hist(label.flatten(), prediction.flatten(), args.num_classes)
 
             # there is no need to transform the one-hot array to visual RGB array
             # predict = colour_code_segmentation(np.array(predict), label_info)
             # label = colour_code_segmentation(np.array(label), label_info)
             precision_record.append(precision)
+        
+        # compute the mean precision:
         precision = np.mean(precision_record)
         # miou = np.mean(per_class_iu(hist))
-        miou_list = per_class_iu(hist)[:-1]
+        miou_list = per_class_iu(hist)[:-1]  # preché tutti tranne l'ultimo?????
         # miou_dict, miou = cal_miou(miou_list, csv_path)
         miou = np.mean(miou_list)
         print('precision per pixel for test: %.3f' % precision)
