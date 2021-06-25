@@ -51,7 +51,30 @@ class resnet101(torch.nn.Module):
         feature3 = self.layer3(feature2)  # 1 / 16
         feature4 = self.layer4(feature3)  # 1 / 32
         # global average pooling to build tail
+        
+        # tail = media lungo la dimensione 3 (dimensione dei canali) di feature4
+        # input like:
+        #[ [ [1, 0], 
+        #    [2, 3] ], 
+        #  [ [4, 5], 
+        #    [6, 7] ] ]
+        # output like:
+        #[ [ [0.5], 
+        #    [2.5] ], 
+        #  [ [4.5], 
+        #    [6.5] ] ]
         tail = torch.mean(feature4, 3, keepdim=True)
+        
+        # tail = media lungo la dimensione 2 (dimensione dei canali) di tail:
+        # input like:
+        #[ [ [0.5], 
+        #    [2.5] ], 
+        #  [ [4.5], 
+        #    [6.5] ] ]
+        # output like:
+        #[ [ [1.5] ], 
+        #  [ [5.5] ] ]
+        # output di dimensione (1, 1, n)
         tail = torch.mean(tail, 2, keepdim=True)
         return feature3, feature4, tail
 
