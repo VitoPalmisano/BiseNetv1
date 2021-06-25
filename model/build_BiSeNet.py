@@ -101,6 +101,7 @@ class BiSeNet(torch.nn.Module):
             self.attention_refinement_module1 = AttentionRefinementModule(256, 256)
             self.attention_refinement_module2 = AttentionRefinementModule(512, 512)
             # supervision block
+            # Che cos'è il supervision block?????
             self.supervision1 = nn.Conv2d(in_channels=256, out_channels=num_classes, kernel_size=1)
             self.supervision2 = nn.Conv2d(in_channels=512, out_channels=num_classes, kernel_size=1)
             # build feature fusion module
@@ -122,6 +123,7 @@ class BiSeNet(torch.nn.Module):
         self.mul_lr.append(self.feature_fusion_module)
         self.mul_lr.append(self.conv)
 
+    # Inizializza i pesi???? Se sì, come???
     def init_weight(self):
         for name, m in self.named_modules():
             if 'context_path' not in name:
@@ -158,6 +160,8 @@ class BiSeNet(torch.nn.Module):
 
         # upsampling
         result = torch.nn.functional.interpolate(result, scale_factor=8, mode='bilinear')
+        
+        # Perché applica questa convoluzione?????
         result = self.conv(result)
 
         if self.training == True:
